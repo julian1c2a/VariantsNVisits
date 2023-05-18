@@ -1,0 +1,31 @@
+# depslib dependency file v1.0
+1684315298 source:c:\users\julia\dropbox\github\variantsnvisits\main.cpp
+	<wuint.hpp>
+	<ExamplesWUint.hpp>
+	<wuint_variant.hpp>
+	<iostream>
+	<limits>
+
+1684266822 c:\users\julia\dropbox\github\variantsnvisits\include\wuint.hpp
+	<bitset>
+	<cassert>
+	<cctype>
+	<charconv>
+	<concepts>
+	<cstdint>
+	<iostream>
+	<string>
+	<limits>
+
+1684032371 c:\users\julia\dropbox\github\variantsnvisits\include\exampleswuint.hpp
+	"wuint.hpp"
+
+1684315048 c:\users\julia\dropbox\github\variantsnvisits\include\wuint_variant.hpp
+	<variant>
+	<bitset>
+	<limits>
+	<type_traits>
+	<concepts>
+	<string>
+	"wuint.hpp"
+

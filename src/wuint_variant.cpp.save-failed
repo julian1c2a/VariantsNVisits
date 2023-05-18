@@ -1,0 +1,493 @@
+
+#include <variant>
+#include <bitset>
+#include <limits>
+#include <type_traits>
+#include <concepts>
+#include <string>
+#include "wuint.hpp"
+#include "wuint_variant.hpp"
+
+constexpr bool wuint_variant::is_0() const noexcept {
+  return std::visit(
+      []<std::uint32_t k>(const wuint<k>& arg)->bool {
+          return (arg.is_0());
+      } ,
+      *this
+  );
+}
+
+constexpr bool wuint_variant::is_not_0() const noexcept {
+  return std::visit(
+      []<std::uint32_t k>(const wuint<k>& arg)->bool {
+          return (arg.is_not_0());
+      } ,
+      *this
+  );
+}
+
+constexpr bool wuint_variant::is_1() const noexcept {
+  return std::visit(
+      []<std::uint32_t k>(const wuint<k>& arg)->bool {
+          return (arg.is_1());
+      } ,
+      *this
+  );
+}
+
+constexpr bool wuint_variant::is_not_1() const noexcept {
+  return std::visit(
+      []<std::uint32_t k>(const wuint<k>& arg)->bool {
+          return (arg.is_not_1());
+      } ,
+      *this
+  );
+}
+
+constexpr bool wuint_variant::is_max() const noexcept {
+  return std::visit(
+      []<std::uint32_t k>(const wuint<k>& arg)->bool {
+          return (arg.is_max());
+      } ,
+      *this
+  );
+}
+
+constexpr bool wuint_variant::is_not_max() const noexcept {
+  return std::visit(
+      []<std::uint32_t k>(const wuint<k>& arg)->bool {
+          return (arg.is_not_max());
+      } ,
+      *this
+  );
+}
+
+constexpr
+std::bitset<wuint_variant::digits> wuint_variant::natural_binary() const noexcept {
+  return
+    std::visit(
+      []<std::uint32_t k>(wuint<k> arg)->std::bitset<digits>{
+        if constexpr (k > 1) {
+          return arg.natural_binary();
+        } else {
+          wuint<k> ret{};
+          return ret.natural_binary();
+        }
+      }, // FIN DE LA DEFINICION DE LA FUNCION LAMBDA
+      *this // ARGUMENTO
+    ) // FIN DE LA LLAMADA AL STD::VISIT
+  ; // FIN DEL RETURN STATEMENT
+} // FIN DE LA FUNCION NATURAL_BINARY() -> STD::BITSET<DIGITS>
+
+std::string wuint_variant::to_string(radixformat rf) const noexcept {
+  return
+    std::visit(
+      [rf]<std::uint32_t k>(const wuint<k>& arg){
+              if constexpr (k > 1)
+                  return arg.to_string(rf);
+              else
+                  return std::string("");
+      }
+      ,
+      *this
+    );
+}
+
+std::string wuint_variant::to_binary_string() const noexcept {
+  return this->to_string(radixformat::bin);
+}
+
+bool wuint_variant::from_string(const std::string& source) noexcept
+{
+  return
+      std::visit(
+          [source]<uint32_t k>(wuint<k>& arg) noexcept {
+              if constexpr (k > 1)
+                  return arg.from_string(source);
+              else
+                  return false;
+          } ,
+          *this
+      );
+}
+
+std::uint32_t wuint_variant::radix() const noexcept {
+  return
+    std::visit(
+       []<std::uint32_t k>(const wuint<k>& arg) -> std::uint32_t {
+           return std::decay_t<decltype(arg)>::radix();
+       } ,*this
+    );
+}
+
+bool wuint_variant::operator==(const wuint_variant& otro) const noexcept {
+  return
+    std::visit(
+      []<std::uint32_t k,std::uint32_t l>(const wuint<k>& left,const wuint<l>& right) -> bool {
+        if constexpr ((k == l) &&(k > 1)){ // CASOS COMPARABLES
+          return  (left == right);
+        }
+        else {// CASOS INCOMPARABLES
+          return false;
+        }
+      },      // FIN DE DEFINICION DE LA FUNCION LAMBDA
+      *this,  // ARGUMENTO 1
+      otro    // ARGUMENTO 2
+    ) // FIN DEL VISIT
+  ;   // FIN DEL RETURN
+}     // FIN DE LA FUNCION OPERATOR==() -> BOOL
+
+bool wuint_variant::operator!=(const wuint_variant& otro) const noexcept {
+  return
+    std::visit(
+      []<std::uint32_t k,std::uint32_t l>(const wuint<k>& left,const wuint<l>& right)->bool{
+        if constexpr ((k == l) &&(k > 1)){ // CASOS COMPARABLES
+          return  (left != right);
+        }
+        else { // CASOS INCOMPARABLES
+          return false;
+        }
+      }, // FIN DE DEFINICION DE LA FUNCION LAMBDA
+      *this, // ARGUMENTO 1
+      otro   // ARGUMENTO 2
+    ) // FIN DEL VISIT
+  ; // FIN DEL RETURN
+} // FIN DE LA FUNCION OPERATOR!= -> BOOL
+
+bool wuint_variant::operator<(const wuint_variant& otro) const noexcept {
+  return
+    std::visit(
+      []<std::uint32_t k,std::uint32_t l>(const wuint<k>& left,const wuint<l>& right)->bool{
+        if constexpr ((k == l) &&(k > 1)){ // CASOS COMPARABLES
+          return  (left < right);
+        }
+        else { // CASOS INCOMPARABLES
+          return false;
+        }
+      }, // FIN DE DEFINICION DE LA FUNCION LAMBDA
+      *this, // ARGUMENTO 1
+      otro   // ARGUMENTO 2
+    ) // FIN DEL VISIT
+  ; // FIN DEL RETURN
+} // FIN DE LA FUNCION OPERATOR== -> BOOL
+
+bool wuint_variant::operator<=(const wuint_variant& otro) const noexcept {
+  return
+    std::visit(
+      []<std::uint32_t k,std::uint32_t l>(const wuint<k>& left,const wuint<l>& right)->bool{
+        if constexpr ((k == l) &&(k > 1)){ // CASOS COMPARABLES
+          return  (left <= right);
+        }
+        else { // CASOS INCOMPARABLES
+          return false;
+        }
+      }, // FIN DE DEFINICION DE LA FUNCION LAMBDA
+      *this, // ARGUMENTO 1
+      otro   // ARGUMENTO 2
+    ) // FIN DEL VISIT
+  ; // FIN DEL RETURN
+} // FIN DE LA FUNCION OPERATOR<= -> BOOL
+
+bool wuint_variant::operator>(const wuint_variant& otro) const noexcept {
+  return
+    std::visit(
+      []<std::uint32_t k,std::uint32_t l>(const wuint<k>& left,const wuint<l>& right)->bool{
+        if constexpr ((k == l) &&(k > 1)){ // CASOS COMPARABLES
+          return  (left > right);
+        }
+        else { // CASOS INCOMPARABLES
+          return false;
+        }
+      }, // FIN DE DEFINICION DE LA FUNCION LAMBDA
+      *this, // ARGUMENTO 1
+      otro   // ARGUMENTO 2
+    ) // FIN DEL VISIT
+  ; // FIN DEL RETURN
+} // FIN DE LA FUNCION OPERATOR> -> BOOL
+
+bool wuint_variant::operator>=(const wuint_variant& otro) const noexcept {
+  return
+    std::visit(
+      []<std::uint32_t k,std::uint32_t l>(const wuint<k>& left,const wuint<l>& right)->bool{
+        if constexpr ((k == l) &&(k > 1)){ // CASOS COMPARABLES
+          return  (left >= right);
+        }
+        else { // CASOS INCOMPARABLES
+          return false;
+        }
+      }, // FIN DE DEFINICION DE LA FUNCION LAMBDA
+      *this, // ARGUMENTO 1
+      otro   // ARGUMENTO 2
+    ) // FIN DEL VISIT
+  ; // FIN DEL RETURN
+} // FIN DE LA FUNCION OPERATOR>= -> BOOL
+
+const wuint_variant& wuint_variant::operator++() noexcept
+{
+  std::visit(
+    []<std::uint32_t k>(wuint<k>& arg) -> void {
+      if constexpr (k > 1)
+        ++arg;
+    }  // FIN DE LA DEFINICION DE LA FUNCION LAMBDA
+    ,
+    *this // ARGUMENTO
+  ); // FIN DE LA LLAMADA AL STD::VISIT
+  return (*this);
+} // FIN DE LA FUNCION OPERATOR++()
+
+const wuint_variant& wuint_variant::operator--() noexcept
+{
+  std::visit(
+    []<std::uint32_t k>(wuint<k>& arg) -> void {
+        if constexpr (k > 1)
+            --arg;
+    }  // FIN DE LA DEFINICION DE LA FUNCION LAMBDA
+    ,
+    *this // ARGUMENTO
+  ); // FIN DE LA LLAMADA AL STD::VISIT
+  return (*this);
+} // FIN DE LA FUNCION OPERATOR--()
+
+wuint_variant wuint_variant::operator++(int) noexcept
+{
+  wuint_variant ret{ *this };
+  ++(*this);
+  return ret;
+}
+
+wuint_variant wuint_variant::operator--(int) noexcept {
+  wuint_variant ret{ *this };
+  --(*this);
+  return ret;
+}
+
+const wuint_variant& wuint_variant::operator|=(const wuint_variant& otro) noexcept {
+  std::visit(
+    []<std::uint32_t k, std::uint32_t l>(wuint<k>& left,const wuint<l>& right) {
+      if constexpr ((k == l) && (k > 1)) {
+        left |= right;
+      }
+    },
+    *this,
+    otro
+  );
+  return (*this);
+}
+
+const wuint_variant& wuint_variant::operator&=(const wuint_variant& otro) noexcept {
+  std::visit(
+    []<std::uint32_t k, std::uint32_t l>(wuint<k>& left,const wuint<l>& right) {
+      if constexpr ((k == l) && (k > 1)) {
+        left &= right;
+      }
+    },
+    *this,
+    otro
+  );
+  return (*this);
+}
+
+const wuint_variant& wuint_variant::operator^=(const wuint_variant& otro) noexcept {
+  std::visit(
+    []<std::uint32_t k, std::uint32_t l>(wuint<k>& left,const wuint<l>& right) {
+      if constexpr ((k == l) && (k > 1)) {
+        left ^= right;
+      }
+    },
+    *this,
+    otro
+  );
+  return (*this);
+}
+
+wuint_variant wuint_variant::operator|(const wuint_variant& otro) const noexcept {
+  auto result{*this};
+  result += otro;
+  return result;
+}
+
+wuint_variant wuint_variant::operator&(const wuint_variant& otro) const noexcept {
+  wuint_variant ret{*this};
+  ret &= otro;
+  return ret;
+}
+
+wuint_variant wuint_variant::operator^(const wuint_variant& otro) const noexcept
+{
+  wuint_variant ret{*this};
+  ret ^= otro;
+  return ret;
+}
+
+const wuint_variant& wuint_variant::operator>>=(size_t n) noexcept {
+  std::visit(
+    [n]<std::uint32_t k>(wuint<k>& arg) -> void {
+        arg >>= n;
+    },
+    *this
+  );
+  return (*this);
+}
+
+const wuint_variant& wuint_variant::operator<<=(size_t n) noexcept {
+  std::visit(
+    [n]<std::uint32_t k>(wuint<k>& arg) -> void {
+        arg <<= n;
+    },
+    *this
+  );
+  return (*this);
+}
+
+wuint_variant wuint_variant::operator<<(size_t n) noexcept {
+  wuint_variant arg{*this};
+  arg <<= n;
+  return arg;
+}
+
+wuint_variant wuint_variant::operator>>(size_t n) noexcept {
+  wuint_variant arg{*this};
+  arg >>= n;
+  return arg;
+}
+
+const wuint_variant& wuint_variant::operator+=(const wuint_variant& otro) noexcept {
+  std::visit(
+    []<uint32_t k,uint32_t l>(wuint<k>& left , const wuint<l>& right) {
+        if constexpr ((k == l) && (k > 1)) {
+            left += right;
+        }
+    },
+    *this,
+    otro
+  );
+  return (*this);
+}
+
+const wuint_variant& wuint_variant::operator-=(const wuint_variant& otro) noexcept {
+  std::visit(
+    []<uint32_t k,uint32_t l>(wuint<k>& left , const wuint<l>& right) {
+        if constexpr ((k == l) && (k > 1)) {
+            left -= right;
+        }
+    },
+    *this,
+    otro
+  );
+  return (*this);
+}
+
+const wuint_variant& wuint_variant::operator*=(const wuint_variant& otro) noexcept {
+  std::visit(
+    []<uint32_t k,uint32_t l>(wuint<k>& left , const wuint<l>& right) {
+        if constexpr ((k == l) && (k > 1)) {
+            left *= right;
+        }
+    },
+    *this,
+    otro
+  );
+  return (*this);
+}
+
+const wuint_variant& wuint_variant::operator/=(const wuint_variant& otro) noexcept {
+  std::visit(
+    []<uint32_t k,uint32_t l>(wuint<k>& left , const wuint<l>& right) {
+        if constexpr ((k == l) && (k > 1)) {
+            if (right != wuint<l>(0ul)) {
+                left /= right;
+            }
+        }
+    },
+    *this,
+    otro
+  );
+  return (*this);
+}
+
+const wuint_variant& wuint_variant::operator%=(const wuint_variant& otro) noexcept {
+  std::visit(
+    []<uint32_t k,uint32_t l>(wuint<k>& left , const wuint<l>& right) {
+        if constexpr ((k == l) && (k > 1)) {
+            if (right != wuint<l>(0ul)) {
+                left %= right;
+            }
+        }
+    },
+    *this,
+    otro
+  );
+  return (*this);
+}
+
+wuint_variant wuint_variant::operator+(wuint_variant otro) noexcept {
+  wuint_variant result{*this};
+  result += otro;
+  return (result);
+}
+
+wuint_variant wuint_variant::operator-(wuint_variant otro) noexcept {
+  wuint_variant result{*this};
+  result -= otro;
+  return (result);
+}
+
+wuint_variant wuint_variant::operator*(wuint_variant otro) noexcept {
+  wuint_variant result{*this};
+  result *= otro;
+  return (result);
+}
+
+wuint_variant wuint_variant::operator/(wuint_variant otro) noexcept {
+  wuint_variant result{*this};
+  if (otro.is_not_0())
+    result /= otro;
+  return (result);
+}
+
+wuint_variant wuint_variant::operator%(wuint_variant otro) noexcept {
+  wuint_variant result{*this};
+  if (otro.is_not_0())
+    result %= otro;
+  return (result);
+}
+
+wuint_variant wuint_variant::operator+() const noexcept {
+  return wuint_variant{*this};
+}
+
+wuint_variant wuint_variant::operator~() const noexcept {
+  wuint_variant result{*this};
+  std::visit(
+    []<std::uint32_t k>(wuint<k>& arg) -> void {
+        arg = ~arg;
+    },
+    result
+  );
+  return result;
+}
+
+
+wuint_variant wuint_variant::operator-() const noexcept {
+  wuint_variant result{*this};
+  std::visit(
+    []<std::uint32_t k>(wuint<k>& arg) -> void {
+        arg = -arg;
+    },
+    result
+  );
+  return result;
+}
+
+std::ostream& operator<<(std::ostream& os, const wuint_variant& arg) {
+  os << arg.to_string();
+  return os;
+}
+
+std::istream& operator>>(std::istream& is, wuint_variant& arg) {
+  std::string source{};
+  is >> source;
+  arg.from_string(source);
+  return is;
+}
+

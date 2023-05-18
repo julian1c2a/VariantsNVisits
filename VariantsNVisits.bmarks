@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<BrowseTracker_layout_file>
+	<ActiveTarget name="Debug" />
+	<File name="src\wuint_variant.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="8690" topLine="333" />
+		<BrowseMarks positions="" />
+	</File>
+	<File name="main.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="203" topLine="0" />
+		<BrowseMarks positions="" />
+	</File>
+	<File name="include\wuint.hpp" open="1" top="1" tabpos="3">
+		<Cursor position="3038" topLine="98" />
+		<BrowseMarks positions="" />
+	</File>
+	<File name="include\ExamplesWUint.hpp" open="1" top="0" tabpos="2">
+		<Cursor position="76" topLine="0" />
+		<BrowseMarks positions="" />
+	</File>
+	<File name="include\wuint_variant.hpp" open="1" top="0" tabpos="4">
+		<Cursor position="696" topLine="15" />
+		<BrowseMarks positions="" />
+	</File>
+</BrowseTracker_layout_file>
